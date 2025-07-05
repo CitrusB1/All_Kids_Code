@@ -1,0 +1,48 @@
+import random
+import time
+
+def slow_print(text):
+    for char in text:
+        print(char, end='', flush=True)
+        time.sleep(0.03)
+    print()
+
+rooms = ["basement", "attic", "bathroom", "kitchen", "closet"]
+monster_room = random.choice(rooms)
+player_alive = True
+
+slow_print("You wake up in a dark, haunted house.")
+time.sleep(1)
+slow_print("You must explore and escape... or DIE.\n")
+
+while player_alive:
+    slow_print(f"\nRooms to choose from: {', '.join(rooms)}")
+    choice = input("Which room do you enter? ").strip().lower()
+
+    if choice not in rooms:
+        slow_print("That room doesn't exist. The walls creak... try again.")
+        continue
+
+    slow_print(f"You open the door to the {choice}...")
+    time.sleep(1.5)
+
+    if choice == monster_room:
+        slow_print("👹 A MONSTER JUMPS OUT AND EATS YOU ALIVE!!!")
+        player_alive = False
+    else:
+        slow_print("...It's empty. For now.")
+        rooms.remove(choice)
+
+    if len(rooms) == 1 and player_alive:
+        slow_print("\nYou've checked almost every room...")
+        slow_print(f"Final room is: {rooms[0]}")
+        final_choice = input("Do you enter it? (yes/no): ").strip().lower()
+
+        if final_choice == "yes":
+            if rooms[0] == monster_room:
+                slow_print("👹 THE MONSTER WAS WAITING! YOU LOSE.")
+            else:
+                slow_print("🎉 You escaped safely! The house is empty.")
+        else:
+            slow_print("😨 You stay frozen in fear. The monster eventually finds you...")
+        break

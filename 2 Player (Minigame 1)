@@ -1,0 +1,82 @@
+import tkinter as tk
+from tkinter import PhotoImage
+import random
+import pygame
+
+# Initialize sound
+pygame.mixer.init()
+def play_sound():
+    pygame.mixer.Sound("scream.wav").play()
+
+# Game state
+rooms = ["Basement", "Attic", "Bathroom", "Kitchen", "Closet"]
+monster_room = random.choice(rooms)
+remaining_rooms = rooms.copy()
+buttons = {}
+players = ["Player 1", "Player 2"]
+turn = 0
+
+# GUI
+root = tk.Tk()
+root.title("Haunted House GUI 🎃")
+root.geometry("600x400")
+
+# Background
+bg = tk.PhotoImage(file="haunted_house.jpg")
+canvas = tk.Canvas(root, width=600, height=400)
+canvas.pack(fill="both", expand=True)
+canvas.create_image(0, 0, anchor="nw", image=bg)
+
+# Message
+result = tk.StringVar()
+label = tk.Label(root, textvariable=result, font=("Courier", 14), fg="white", bg="#000000", wraplength=500)
+label.place(x=50, y=20)
+
+def enter_room(room):
+    global turn
+    player = players[turn % 2]
+    
+    if room == monster_room:
+        result.set(f"💀 {player} entered the {room}...\n👹 A MONSTER GOT YOU!")
+        play_sound()
+        disable_buttons()
+    else:
+        result.set(f"{player} entered the {room}...\nIt's empty. Still safe!")
+        buttons[room].config(state='disabled')
+        remaining_rooms.remove(room)
+        turn += 1
+
+        if len(remaining_rooms) == 1:
+            result.set(f"One room remains: {remaining_rooms[0]}\n{players[turn % 2]}, your choice!")
+            final_button.config(state='normal')
+
+def final_room():
+    room = remaining_rooms[0]
+    player = players[turn % 2]
+    if room == monster_room:
+        result.set(f"👹 {player} entered the {room}...\nBOOM! The monster got you.")
+        play_sound()
+    else:
+        result.set(f"🎉 {player} chose the last room...\nYou survived the haunted house!")
+    disable_buttons()
+
+def disable_buttons():
+    for btn in buttons.values():
+        btn.config(state='disabled')
+    final_button.config(state='disabled')
+
+# Room buttons
+y_start = 200
+for i, room in enumerate(rooms):
+    btn = tk.Button(root, text=room, command=lambda r=room: enter_room(r), width=12)
+    btn.place(x=100 + (i % 3) * 130, y=y_start + (i // 3) * 50)
+    buttons[room] = btn
+
+# Final room button
+final_button = tk.Button(root, text="Enter Final Room", state='disabled', command=final_room)
+final_button.place(x=220, y=340)
+
+# Start message
+result.set(f"{players[0]} begins. Choose a room...")
+
+root.mainloop()
